@@ -1,0 +1,54 @@
+class Solution {
+public:
+    vector<int> survivedRobotsHealths(vector<int>& positions, vector<int>& healths, string directions) {
+        int n = positions.size();
+        
+        vector<pair<int,int>> robots;
+        for (int i = 0; i < n; i++) {
+            robots.push_back({positions[i], i});
+        }
+        
+        sort(robots.begin(), robots.end());
+        
+        stack<int> st; // indices of 'R' robots
+        vector<int> curr_health = healths;
+        
+        for (auto &r : robots) {
+            int idx = r.second;
+            
+            if (directions[idx] == 'R') {
+                st.push(idx);
+            } else {
+                while (!st.empty() && curr_health[idx] > 0) {
+                    int top = st.top();
+                    
+                    if (curr_health[top] < curr_health[idx]) {
+                        st.pop();
+                        curr_health[idx]--;
+                        curr_health[top] = 0;   // ✅ FIX: mark dead
+                    } 
+                    else if (curr_health[top] == curr_health[idx]) {
+                        st.pop();
+                        curr_health[top] = 0;
+                        curr_health[idx] = 0;
+                        break;
+                    } 
+                    else {
+                        curr_health[top]--;
+                        curr_health[idx] = 0;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        vector<int> result;
+        for (int i = 0; i < n; i++) {
+            if (curr_health[i] > 0) {
+                result.push_back(curr_health[i]);
+            }
+        }
+        
+        return result;
+    }
+};
