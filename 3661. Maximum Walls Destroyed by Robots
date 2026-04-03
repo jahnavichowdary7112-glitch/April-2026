@@ -1,0 +1,39 @@
+from bisect import bisect_left,bisect_right
+from typing import List
+class Solution:
+    def maxWalls(self,robots:List[int],distance:List[int],walls:List[int])->int:
+        robots_with_d=sorted(zip(robots,distance))
+        robots=[r for r,_ in robots_with_d]
+        distance=[d for _,d in robots_with_d]
+        walls.sort()
+        n=len(robots)
+        left_intervals=[]
+        right_intervals=[]
+        for i in range(n):
+            r=robots[i];d=distance[i]
+            L=r-d
+            if i>0:L=max(L,robots[i-1])
+            l=bisect_left(walls,L);rr=bisect_right(walls,r)
+            left_intervals.append((l,rr))
+            R=r+d
+            if i<n-1:R=min(R,robots[i+1])
+            l=bisect_left(walls,r);rr=bisect_right(walls,R)
+            right_intervals.append((l,rr))
+        m=len(walls)
+        pref=[0]*(m+1)
+        for i in range(m):pref[i+1]=pref[i]+1
+        def get_count(l,r):return pref[r]-pref[l]
+        dp=[[0]*2 for _ in range(n)]
+        dp[0][0]=get_count(*left_intervals[0])
+        dp[0][1]=get_count(*right_intervals[0])
+        for i in range(1,n):
+            for cur in range(2):
+                l1,r1=(left_intervals[i] if cur==0 else right_intervals[i])
+                curr_count=get_count(l1,r1)
+                best=0
+                for prev in range(2):
+                    l0,r0=(left_intervals[i-1] if prev==0 else right_intervals[i-1])
+                    overlap=max(0,min(r0,r1)-max(l0,l1))
+                    best=max(best,dp[i-1][prev]+curr_count-overlap)
+                dp[i][cur]=best
+        return max(dp[n-1][0],dp[n-1][1])
