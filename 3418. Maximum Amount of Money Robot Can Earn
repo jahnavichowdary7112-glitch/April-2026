@@ -1,0 +1,32 @@
+class Solution:
+    def maximumAmount(self, coins):
+        m,n=len(coins),len(coins[0])
+        dp=[[float('-inf')]*3 for _ in range(n)]
+        for k in range(3):
+            if coins[m-1][n-1]<0 and k>0:
+                dp[n-1][k]=0
+            else:
+                dp[n-1][k]=coins[m-1][n-1]
+        for i in range(m-1,-1,-1):
+            new_dp=[[float('-inf')]*3 for _ in range(n)]
+            for j in range(n-1,-1,-1):
+                for k in range(3):
+                    if i==m-1 and j==n-1:
+                        new_dp[j][k]=dp[j][k]
+                        continue
+                    best=float('-inf')
+                    if j+1<n:
+                        best=max(best,new_dp[j+1][k])
+                    if i+1<m:
+                        best=max(best,dp[j][k])
+                    val=coins[i][j]+best
+                    if coins[i][j]<0 and k>0:
+                        neutral_best=float('-inf')
+                        if j+1<n:
+                            neutral_best=max(neutral_best,new_dp[j+1][k-1])
+                        if i+1<m:
+                            neutral_best=max(neutral_best,dp[j][k-1])
+                        val=max(val,neutral_best)
+                    new_dp[j][k]=val
+            dp=new_dp
+        return dp[0][2]
