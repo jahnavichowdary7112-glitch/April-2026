@@ -1,0 +1,12 @@
+class Solution:
+    def minimumDistance(self, nums: List[int]) -> int:
+        last1 = {}
+        last2 = {}
+        ans = float('inf')       
+        for i, x in enumerate(nums):
+            if x in last2:
+                ans = min(ans, 2 * (i - last2[x]))           
+            if x in last1:
+                last2[x] = last1[x]          
+            last1[x] = i        
+        return ans if ans != float('inf') else -1
