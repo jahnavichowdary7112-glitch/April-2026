@@ -1,0 +1,30 @@
+from collections import defaultdict
+import bisect
+class Solution:
+    def solveQueries(self, nums, queries):
+        n = len(nums)
+        pos = defaultdict(list)       
+        for i, x in enumerate(nums):
+            pos[x].append(i)      
+        res = []        
+        for q in queries:
+            arr = pos[nums[q]]           
+            if len(arr) == 1:
+                res.append(-1)
+                continue          
+            i = bisect.bisect_left(arr, q)
+            ans = float('inf')           
+            if i > 0:
+                d = abs(q - arr[i-1])
+                ans = min(ans, min(d, n - d))           
+            if i < len(arr) - 1:
+                d = abs(arr[i+1] - q)
+                ans = min(ans, min(d, n - d))            
+            if i == 0:
+                d = abs(q - arr[-1])
+                ans = min(ans, min(d, n - d))         
+            if i == len(arr) - 1:
+                d = abs(q - arr[0])
+                ans = min(ans, min(d, n - d))          
+            res.append(ans)        
+        return res
