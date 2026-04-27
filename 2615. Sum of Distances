@@ -1,0 +1,18 @@
+from collections import defaultdict
+class Solution:
+    def distance(self, nums):
+        pos = defaultdict(list)
+        for i, x in enumerate(nums):
+            pos[x].append(i)
+        res = [0] * len(nums)
+        for arr in pos.values():
+            k = len(arr)
+            prefix = [0] * (k + 1)
+            for i in range(k):
+                prefix[i+1] = prefix[i] + arr[i]          
+            for p in range(k):
+                i = arr[p]
+                left = i * p - prefix[p]
+                right = (prefix[k] - prefix[p+1]) - i * (k - p - 1)   
+                res[i] = left + right
+        return res
